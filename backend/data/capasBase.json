@@ -1,0 +1,93 @@
+[
+  {
+    "id": "osm",
+    "titulo": "OpenStreetMap",
+    "tipo": "OSM",
+    "grupo": "base",
+    "visible": true
+  },
+  {
+    "id": "sat",
+    "titulo": "Satélite",
+    "tipo": "XYZ",
+    "url": "https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
+    "grupo": "base",
+    "visible": false
+  },
+  {
+    "id": "vialidad",
+    "titulo": "Partidos",
+    "tipo": "WMS",
+    "url": "http://www.vialidad.gba.gov.ar:3126/geoserver/wms",
+    "layers": "cite:PARTIDOS_SCR",
+    "format": "image/png",
+    "grupo": "overlay",
+    "visible": false,
+
+    "leyenda": {
+      "mostrar": true,
+      "tipo": "polygon",
+      "color": "255,215,0",
+      "borde": "51,51,51"
+    },
+
+    "controles": {
+      "opacidad": true,
+      "visible": true
+    }
+  },
+  {
+    "id": "rutas",
+    "titulo": "Rutas Provinciales",
+    "tipo": "WMS",
+    "url": "http://www.vialidad.gba.gov.ar:3126/geoserver/wms",
+    "layers": "cite:RUTAS_SCR",
+    "grupo": "overlay",
+    "visible": true,
+  
+    "leyenda": {
+      "mostrar": true,
+      "tipo": "line",
+      "color": "200,0,0",
+      "ancho": 3
+    }
+  },
+  {
+    "id": "rutas",
+    "titulo": "Restricciones",
+    "tipo": "WMS",
+    "url": "http://www.vialidad.gba.gov.ar:3126/geoserver/wms",
+    "layers": "cite:RESTRICCIONES_SCR",
+    "grupo": "overlay",
+    "visible": true,
+  
+    "leyenda": {
+      "mostrar": true,
+      "tipo": "line",
+      "color": "200,0,0",
+      "ancho": 3
+    }
+  },
+  {
+    "id": "accidentes",
+    "titulo": "Accidentes",
+    "tipo": "WMS",
+    "url": "http://www.vialidad.gba.gov.ar:3126/geoserver/wms",
+    "layers": "cite:ACCIDENTES_SCR",
+    "grupo": "overlay",
+    "visible": false,
+  
+    "leyenda": {
+      "mostrar": true,
+      "tipo": "point",
+      "color": "255,0,0"
+    }
+  }
+  
+  
+]
+
+
+
+  
+  
