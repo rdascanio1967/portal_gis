@@ -11,6 +11,20 @@ const map = new ol.Map({
   })
 });
 /************************************************
+ * CONTROLES BÁSICOS
+ ************************************************/
+
+map.addControl(new ol.control.ScaleLine());
+
+map.addControl(
+  new ol.control.MousePosition({
+    projection: 'EPSG:4326',
+    coordinateFormat: coord =>
+      ol.coordinate.format(coord, '{x}, {y}', 5)
+  })
+);
+
+/************************************************
  * 2. CREAR CAPAS DESDE CONFIG
  ************************************************/
 
@@ -63,59 +77,67 @@ fetch('http://localhost:3000/api/capas-base')
   })
   .catch(err => console.error(err));
   /************************************************
- * 4. CREAR ITEM DEL TOC
+ * TOC - CAPAS BASE (RADIOS)
  ************************************************/
 
-function crearItemTOC(cfg, layer) {
+function agregarBaseTOC(capa) {
+  const cont = document.getElementById('toc-bases');
 
-  const cont =
-    cfg.grupo === 'base'
-      ? document.getElementById('toc-bases')
-      : document.getElementById('toc-overlays');
+  const label = document.createElement('label');
+  label.className = 'toc-item';
 
-  const item = document.createElement('div');
-  item.className = 'toc-item';
+  const radio = document.createElement('input');
+  radio.type = 'radio';
+  radio.name = 'base';
+  radio.checked = capa.getVisible();
 
-  const input = document.createElement('input');
-
-  input.type = cfg.grupo === 'base' ? 'radio' : 'checkbox';
-  input.name = cfg.grupo === 'base' ? 'base' : cfg.id;
-  input.checked = layer.getVisible();
-
-  input.addEventListener('change', () => {
-
-    if (cfg.grupo === 'base') {
-
-      map.getLayers().forEach(l => {
-        if (l.get('type') === 'base') {
-          l.setVisible(l === layer);
-        }
-      });
-
-    } else {
-      layer.setVisible(input.checked);
-    }
-
+  radio.addEventListener('change', () => {
+    map.getLayers().forEach(l => {
+      if (l.get('type') === 'base') {
+        l.setVisible(l === capa);
+      }
+    });
   });
 
-  const label = document.createElement('span');
-  label.textContent = cfg.titulo;
+  label.appendChild(radio);
+  label.append(capa.get('title'));
+  cont.appendChild(label);
+}
 
-  item.append(input, label);
-  cont.appendChild(item);
+/************************************************
+ * TOC - OVERLAYS (CHECKBOX)
+ ************************************************/
+
+function agregarOverlayTOC(capa) {
+  const cont = document.getElementById('toc-overlays');
+
+  const label = document.createElement('label');
+  label.className = 'toc-item';
+
+  const check = document.createElement('input');
+  check.type = 'checkbox';
+  check.checked = capa.getVisible();
+
+  check.addEventListener('change', () => {
+    capa.setVisible(check.checked);
+  });
+
+  label.appendChild(check);
+  label.append(capa.get('title'));
+  cont.appendChild(label);
 }
 fetch('http://localhost:3000/api/capas-base')
   .then(res => res.json())
   .then(capas => {
-
     capas.forEach(cfg => {
+      const capa = crearCapa(cfg);
+      map.addLayer(capa);
 
-      const layer = crearCapa(cfg);
-      map.addLayer(layer);
-
-      crearItemTOC(cfg, layer);
-
+      if (capa.get('type') === 'base') {
+        agregarBaseTOC(capa);
+      } else {
+        agregarOverlayTOC(capa);
+      }
     });
-
   })
-  .catch(err => console.error(err));
+  .catch(err => console.error('Error cargando capas', err));
