@@ -13,20 +13,30 @@
 </head>
 <body>
 
-  <!-- <div id="bases"></div>
-  <hr>
-  <div id="overlays"></div>
-  
-  <div id="map"></div> -->
-  <div id="map"></div>
   <div id="panel">
-    <h3>Capas base</h3>
+
+    <h3>Mapas Base</h3>
     <div id="toc-bases"></div>
   
     <h3>Capas</h3>
-    <div id="toc-overlays"></div>
+  
+    <div class="grupo" data-grupo="limites">
+      <div class="grupo-header">Límites</div>
+      <div class="grupo-contenido" id="grupo-limites"></div>
+    </div>
+  
+    <div class="grupo" data-grupo="vial">
+      <div class="grupo-header">Vial</div>
+      <div class="grupo-contenido" id="grupo-vial"></div>
+    </div>
+  
+    <div class="grupo" data-grupo="seguridad">
+      <div class="grupo-header">Seguridad Vial</div>
+      <div class="grupo-contenido" id="grupo-seguridad"></div>
+    </div>
+  
   </div>
- 
+  <div id="map"></div>
 
   <!-- OpenLayers local -->
   <script src="lib/ol/ol.js"></script>
@@ -34,6 +44,15 @@
   <!-- Tu mapa -->
   <script src="/frontend/js/overlays.js"></script>
   <script src="js/map.js"></script>
-
+  
+  <script>
+    document.querySelectorAll('.grupo-header').forEach(header => {
+      header.addEventListener('click', () => {
+        const grupo = header.parentElement;
+        grupo.classList.toggle('abierto');
+      });
+    });
+    </script>
+    
 </body>
 </html>

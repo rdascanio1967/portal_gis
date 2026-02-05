@@ -9,6 +9,7 @@ html, body {
   height: 100vh;
 }
 
+/* PANEL LATERAL */
 #panel {
   position: absolute;
   top: 10px;
@@ -19,11 +20,110 @@ html, body {
   border-radius: 6px;
   box-shadow: 0 2px 6px rgba(0,0,0,0.3);
   z-index: 1000;
+  max-height: 90vh;
+  overflow-y: auto;
 }
 
+#panel h3 {
+  margin: 10px 0 6px;
+  font-size: 15px;
+  font-weight: bold;
+  color: #333;
+}
+
+/* Ítems del TOC */
 .toc-item {
   display: flex;
   align-items: center;
   gap: 6px;
   margin-bottom: 6px;
 }
+
+/* OVERLAYS AVANZADOS */
+.overlay-wrapper {
+  margin-bottom: 8px;
+}
+
+.overlay-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  user-select: none;
+  padding: 4px;
+  border-radius: 4px;
+}
+
+.overlay-header:hover {
+  background: rgba(0,0,0,0.05);
+}
+
+.overlay-check {
+  cursor: pointer;
+}
+
+.overlay-title {
+  font-weight: bold;
+  color: #333;
+}
+
+/* Flecha animada */
+.flecha {
+  transition: transform 0.2s ease;
+  display: inline-block;
+}
+
+.flecha.abierta {
+  transform: rotate(90deg);
+}
+
+/* Panel colapsable */
+.overlay-opciones {
+  margin-left: 20px;
+  padding-left: 6px;
+  border-left: 2px solid #ccc;
+  margin-top: 4px;
+  display: none;
+}
+
+.opacidad-slider {
+  width: 100%;
+}
+
+/* GRUPOS */
+.grupo {
+  margin-bottom: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  background: #fafafa;
+}
+
+.grupo-header {
+  padding: 6px 8px;
+  font-weight: bold;
+  background: #e6e6e6;
+  cursor: pointer;
+  user-select: none;
+  border-radius: 4px 4px 0 0;
+}
+
+.grupo-header:hover {
+  background: #dcdcdc;
+}
+
+.grupo-contenido {
+  padding: 3px;
+  display: none;
+}
+
+.grupo.abierto .grupo-contenido {
+  display: block;
+}
+.overlay-opciones {
+  font-size: 10px;
+}
+
+.overlay-opciones img {
+  max-width: 100%;
+}
+

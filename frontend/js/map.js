@@ -1,17 +1,18 @@
 /************************************************
- * 1. CREAR EL MAPA
+ * 1. MAPA
  ************************************************/
 
 const map = new ol.Map({
   target: 'map',
-  layers: [],   // las capas se agregan después
+  layers: [],
   view: new ol.View({
-    center: ol.proj.fromLonLat([-58.3, -34.6]),
+    center: ol.proj.fromLonLat([-58.0, -37.3]),
     zoom: 7
   })
 });
+
 /************************************************
- * CONTROLES BÁSICOS
+ * 2. CONTROLES
  ************************************************/
 
 map.addControl(new ol.control.ScaleLine());
@@ -25,11 +26,10 @@ map.addControl(
 );
 
 /************************************************
- * 2. CREAR CAPAS DESDE CONFIG
+ * 3. CREAR CAPA DESDE CONFIG
  ************************************************/
 
 function crearCapa(cfg) {
-
   let source;
 
   if (cfg.tipo === 'OSM') {
@@ -58,26 +58,12 @@ function crearCapa(cfg) {
     source: source,
     title: cfg.titulo,
     visible: cfg.visible || false,
-    type: cfg.grupo
+    type: cfg.grupo // 'base' u 'overlay'
   });
 }
+
 /************************************************
- * 3. CARGAR CAPAS DESDE NODE
- ************************************************/
-
-fetch('http://localhost:3000/api/capas-base')
-  .then(res => res.json())
-  .then(capas => {
-
-    capas.forEach(cfg => {
-      const capa = crearCapa(cfg);
-      map.addLayer(capa);
-    });
-
-  })
-  .catch(err => console.error(err));
-  /************************************************
- * TOC - CAPAS BASE (RADIOS)
+ * 4. TOC BASES
  ************************************************/
 
 function agregarBaseTOC(capa) {
@@ -105,27 +91,15 @@ function agregarBaseTOC(capa) {
 }
 
 /************************************************
- * TOC - OVERLAYS (CHECKBOX)
+ * 5. TOC OVERLAYS
  ************************************************/
 
-function agregarOverlayTOC(capa) {
-  const cont = document.getElementById('toc-overlays');
 
-  const label = document.createElement('label');
-  label.className = 'toc-item';
 
-  const check = document.createElement('input');
-  check.type = 'checkbox';
-  check.checked = capa.getVisible();
-
-  check.addEventListener('change', () => {
-    capa.setVisible(check.checked);
-  });
-
-  label.appendChild(check);
-  label.append(capa.get('title'));
-  cont.appendChild(label);
-}
+/************************************************
+ * 6. CARGA ÚNICA DESDE NODE
+ ************************************************/
+/*
 fetch('http://localhost:3000/api/capas-base')
   .then(res => res.json())
   .then(capas => {
@@ -133,11 +107,60 @@ fetch('http://localhost:3000/api/capas-base')
       const capa = crearCapa(cfg);
       map.addLayer(capa);
 
-      if (capa.get('type') === 'base') {
+      if (cfg.grupo === 'base') {
         agregarBaseTOC(capa);
       } else {
-        agregarOverlayTOC(capa);
-      }
+        const grupo = cfg.grupo;
+const contenedor = document.getElementById(`grupo-${grupo}`);
+
+if (contenedor) {
+  crearOverlayConOpciones(capa.get('title'), capa, contenedor);
+};
+}
     });
   })
+  .catch(err => console.error('Error cargando capas', err));*/
+
+  fetch('http://localhost:3000/api/capas-base')
+  .then(res => res.json())
+  .then(capas => {
+
+    capas.forEach(cfg => {
+
+      const capa = crearCapa(cfg);
+      map.addLayer(capa);
+
+      // --- BASES ---
+      if (capa.get('type') === 'base') {
+        agregarBaseTOC(capa);
+      }
+
+      // --- OVERLAYS ---
+      else {
+        const grupo = cfg.grupo;
+        const contenedor = document.getElementById(`grupo-${grupo}`);
+
+        if (contenedor) {
+          crearOverlayConOpciones(capa.get('title'), capa, contenedor);
+        }
+      }
+
+    });
+
+    //  DEBUG VISUAL (ACÁ VA)
+   /* console.log('--- CAPAS EN EL MAPA ---');
+    map.getLayers().forEach(l => {
+      console.log(
+        l.get('title'),
+        '| type:', l.get('type'),
+        '| visible:', l.getVisible(),
+        '| zIndex:', l.getZIndex()
+      );
+    });*/
+
+  })
   .catch(err => console.error('Error cargando capas', err));
+
+ 
+  
+  
