@@ -1,6 +1,12 @@
 /************************************************
- * 1. MAPA
+ * 1. MAPA Y POPUP
  ************************************************/
+
+const popupOverlay = new ol.Overlay({
+  element: document.getElementById('popup'),
+  positioning: 'bottom-center',
+  stopEvent: false
+});
 
 const map = new ol.Map({
   target: 'map',
@@ -10,6 +16,8 @@ const map = new ol.Map({
     zoom: 7
   })
 });
+
+map.addOverlay(popupOverlay);
 
 /************************************************
  * 2. CONTROLES
@@ -55,10 +63,11 @@ function crearCapa(cfg) {
   }
 
   return new ol.layer.Tile({
-    source: source,
+    source,
     title: cfg.titulo,
     visible: cfg.visible || false,
-    type: cfg.grupo // 'base' u 'overlay'
+    type: cfg.grupo,
+    opacity: 1
   });
 }
 
@@ -68,6 +77,7 @@ function crearCapa(cfg) {
 
 function agregarBaseTOC(capa) {
   const cont = document.getElementById('toc-bases');
+  if (!cont) return;
 
   const label = document.createElement('label');
   label.className = 'toc-item';
@@ -91,76 +101,109 @@ function agregarBaseTOC(capa) {
 }
 
 /************************************************
- * 5. TOC OVERLAYS
+ * 5. CARGA ÚNICA DE CAPAS DESDE NODE
  ************************************************/
 
-
-
-/************************************************
- * 6. CARGA ÚNICA DESDE NODE
- ************************************************/
-/*
 fetch('http://localhost:3000/api/capas-base')
   .then(res => res.json())
   .then(capas => {
+
     capas.forEach(cfg => {
+
       const capa = crearCapa(cfg);
+      capa.cfg = cfg;              // 🔥 clave para overlays / leyendas
       map.addLayer(capa);
 
+      // ---- BASES ----
       if (cfg.grupo === 'base') {
         agregarBaseTOC(capa);
-      } else {
-        const grupo = cfg.grupo;
-const contenedor = document.getElementById(`grupo-${grupo}`);
-
-if (contenedor) {
-  crearOverlayConOpciones(capa.get('title'), capa, contenedor);
-};
-}
-    });
-  })
-  .catch(err => console.error('Error cargando capas', err));*/
-
-  fetch('http://localhost:3000/api/capas-base')
-  .then(res => res.json())
-  .then(capas => {
-
-    capas.forEach(cfg => {
-
-      const capa = crearCapa(cfg);
-      map.addLayer(capa);
-
-      // --- BASES ---
-      if (capa.get('type') === 'base') {
-        agregarBaseTOC(capa);
       }
 
-      // --- OVERLAYS ---
+      // ---- OVERLAYS ----
       else {
-        const grupo = cfg.grupo;
-        const contenedor = document.getElementById(`grupo-${grupo}`);
-
+        const contenedor = document.getElementById(`grupo-${cfg.grupo}`);
         if (contenedor) {
-          crearOverlayConOpciones(capa.get('title'), capa, contenedor);
+          crearOverlayConOpciones(cfg.titulo, capa, contenedor);
         }
       }
-
     });
-
-    //  DEBUG VISUAL (ACÁ VA)
-   /* console.log('--- CAPAS EN EL MAPA ---');
-    map.getLayers().forEach(l => {
-      console.log(
-        l.get('title'),
-        '| type:', l.get('type'),
-        '| visible:', l.getVisible(),
-        '| zIndex:', l.getZIndex()
-      );
-    });*/
 
   })
   .catch(err => console.error('Error cargando capas', err));
 
- 
-  
-  
+/************************************************
+ * 6. CONSULTAS GetFeatureInfo
+ ************************************************/
+
+map.on('singleclick', function (evt) {
+  const resolution = map.getView().getResolution();
+  const coordinate = evt.coordinate;
+
+  let resultados = [];
+  let pendientes = 0;
+
+  map.getLayers().forEach(layer => {
+
+    if (
+      layer.getVisible() &&
+      layer.getSource() instanceof ol.source.TileWMS
+    ) {
+      const url = layer.getSource().getFeatureInfoUrl(
+        coordinate,
+        resolution,
+        'EPSG:3857',
+        {
+          INFO_FORMAT: 'application/json',
+          BUFFER: 10
+        }
+      );
+
+      if (url) {
+        pendientes++;
+
+        fetch(url)
+          .then(res => res.json())
+          .then(data => {
+            if (data.features?.length) {
+              resultados.push({
+                capa: layer.get('title'),
+                atributos: data.features[0].properties
+              });
+            }
+          })
+          .finally(() => {
+            pendientes--;
+            if (pendientes === 0) {
+              mostrarPopupMultiple(resultados, coordinate);
+            }
+          });
+      }
+    }
+  });
+});
+
+/************************************************
+ * 7. POPUP MULTICAPA
+ ************************************************/
+
+function mostrarPopupMultiple(resultados, coordinate) {
+  if (!resultados.length) {
+    popupOverlay.setPosition(undefined);
+    return;
+  }
+
+  let html = '<div class="popup-content">';
+
+  resultados.forEach(r => {
+    html += `<h4>${r.capa}</h4>`;
+    for (let key in r.atributos) {
+      html += `<b>${key}:</b> ${r.atributos[key]}<br>`;
+    }
+    html += '<hr>';
+  });
+
+  html += '</div>';
+
+  document.getElementById('popup').innerHTML = html;
+  popupOverlay.setPosition(coordinate);
+}

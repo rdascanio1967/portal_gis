@@ -127,3 +127,74 @@ html, body {
   max-width: 100%;
 }
 
+.ol-popup {
+  position: absolute;
+  background: white;
+  padding: 10px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  min-width: 200px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+  font-size: 13px;
+  z-index: 2000;
+}
+
+.popup-content b {
+  color: #333;
+}
+.popup-content h4 {
+  margin: 4px 0;
+  font-size: 14px;
+  color: #333;
+}
+
+.popup-content hr {
+  margin: 6px 0;
+  border: none;
+  border-top: 1px solid #ccc;
+}
+
+.overlay-wrapper {
+  margin-bottom: 6px;
+  font-size: 13px;
+}
+
+.overlay-header {
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.overlay-title {
+  flex: 1;
+}
+
+.overlay-content {
+  margin-left: 18px;
+  margin-top: 4px;
+}
+
+.overlay-opacidad label {
+  font-size: 11px;
+}
+
+.leyenda-custom {
+  margin-top: 6px;
+}
+
+.leyenda-poligono {
+  width: 18px;
+  height: 18px;
+}
+
+.leyenda-linea {
+  width: 80px;
+  margin-top: 6px;
+}
+
+.leyenda-punto {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+}

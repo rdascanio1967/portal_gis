@@ -89,6 +89,21 @@
       "ancho": 3
     }
   },
+  {
+    "id": "obras_viales",
+    "titulo": "Obras Viales",
+    "tipo": "WMS",
+    "url": "http://www.vialidad.gba.gov.ar:3126/geoserver/wms",
+    "layers": "cite:OBRAS_SCR",
+    "grupo": "vial",
+    "visible": false,
+    "leyenda": {
+      "mostrar": true,
+      "tipo": "line",
+      "color": "200,0,0",
+      "ancho": 3
+    }
+  },
 
   {
     "id": "accidentes",
