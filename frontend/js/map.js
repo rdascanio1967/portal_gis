@@ -7,6 +7,21 @@ const popupOverlay = new ol.Overlay({
   positioning: 'bottom-center',
   stopEvent: false
 });
+const highlightLayer = new ol.layer.Vector({
+  source: new ol.source.Vector(),
+  style: new ol.style.Style({
+    stroke: new ol.style.Stroke({
+      color: 'yellow',
+      width: 3
+    }),
+    fill: new ol.style.Fill({
+      color: 'rgba(255,255,0,0.2)'
+    })
+  })
+});
+
+
+
 
 const map = new ol.Map({
   target: 'map',
@@ -18,6 +33,7 @@ const map = new ol.Map({
 });
 
 map.addOverlay(popupOverlay);
+map.addLayer(highlightLayer);
 
 /************************************************
  * 2. CONTROLES
@@ -168,14 +184,17 @@ map.on('singleclick', function (evt) {
               resultados.push({
                 capa: layer.get('title'),
                 layer: layer,
-                atributos: data.features[0].properties
+                atributos: data.features[0].properties,
+                geometry: data.features[0].geometry
+                
               });
             }
           })
           .finally(() => {
             pendientes--;
             if (pendientes === 0) {
-              mostrarPopupMultiple(resultados, coordinate);
+              /*mostrarPopupMultiple(resultados, coordinate);*/
+              mostrarPanelInfo(resultados,coordinate);
             }
           });
       }
@@ -213,7 +232,7 @@ function formatearValor(alias, valor) {
 
   return valor;
 }
-
+/*
 function mostrarPopupMultiple(resultados, coordinate) {
   if (!resultados.length) {
     popupOverlay.setPosition(undefined);
@@ -293,6 +312,78 @@ function mostrarPopupMultiple(resultados, coordinate) {
   });
 
   hacerPopupDraggable();
+}
+*/
+function mostrarPanelInfo(resultados, coordinate) {
+  const panel = document.getElementById("panel-info");
+  panel.innerHTML = "";
+  panel.style.display = "block";
+
+  // Limpiar highlight
+  highlightLayer.getSource().clear();
+
+  // Crear cabecera
+  let html = `<span class="close-btn">✖</span>`;
+  html += `<h3>Resultado</h3>`;
+
+  // Pestañas
+  html += `<div class="tab-headers">`;
+  resultados.forEach((r, i) => {
+    html += `<div class="tab-header ${i === 0 ? "active" : ""}" data-tab="${i}">
+               ${r.capa}
+             </div>`;
+  });
+  html += `</div>`;
+
+  // Cuerpos
+  resultados.forEach((r, i) => {
+    html += `<div class="tab-body ${i === 0 ? "active" : ""}" data-tab="${i}">
+               <table>`;
+
+    const cfgPopup = r.layer.cfg.popup;
+
+    if (cfgPopup) {
+      for (let campo in cfgPopup) {
+        const alias = cfgPopup[campo];
+        const valor = formatearValor(alias, r.atributos[campo]);
+        html += `<tr><th>${alias}</th><td>${valor}</td></tr>`;
+      }
+    }
+
+    html += `</table></div>`;
+  });
+
+  panel.innerHTML = html;
+
+  // Activar pestañas
+  panel.querySelectorAll(".tab-header").forEach(header => {
+    header.addEventListener("click", () => {
+      const tab = header.dataset.tab;
+
+      panel.querySelectorAll(".tab-header").forEach(h => h.classList.remove("active"));
+      panel.querySelectorAll(".tab-body").forEach(b => b.classList.remove("active"));
+
+      header.classList.add("active");
+      panel.querySelector(`.tab-body[data-tab="${tab}"]`).classList.add("active");
+    });
+  });
+
+  // Botón cerrar
+  panel.querySelector(".close-btn").addEventListener("click", () => {
+    panel.style.display = "none";
+    highlightLayer.getSource().clear();
+  });
+
+  // Highlight de la geometría
+  resultados.forEach(r => {
+    if (r.geometry) {
+      const format = new ol.format.GeoJSON();
+      const feature = format.readFeature(r.geometry, {
+        featureProjection: "EPSG:3857"
+      });
+      highlightLayer.getSource().addFeature(feature);
+    }
+  });
 }
 
 function hacerPopupDraggable() {

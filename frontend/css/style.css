@@ -1,47 +1,35 @@
 html, body {
   margin: 0;
   padding: 0;
+  width: 100%;
   height: 100%;
+  overflow: hidden;
+  font-family: Arial, sans-serif;
 }
 
 #map {
   width: 100%;
-  height: 100vh;
+  height: 100%;
 }
 
-/* PANEL LATERAL */
+/* PANEL */
 #panel {
   position: absolute;
   top: 10px;
   left: 10px;
-  width: 260px;
-  background: rgba(244, 246, 248, 0.95);
+  width: 280px;
+  background: rgba(244,246,248,0.97);
   padding: 10px;
   border-radius: 6px;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+  box-shadow: 0 2px 6px rgba(0,0,0,.3);
   z-index: 1000;
   max-height: 90vh;
   overflow-y: auto;
 }
 
-#panel h3 {
-  margin: 10px 0 6px;
-  font-size: 15px;
-  font-weight: bold;
-  color: #333;
-}
-
-/* Ítems del TOC */
-.toc-item {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  margin-bottom: 6px;
-}
-
-/* OVERLAYS AVANZADOS */
+/* OVERLAYS */
 .overlay-wrapper {
-  margin-bottom: 8px;
+  margin-bottom: 6px;
 }
 
 .overlay-header {
@@ -49,136 +37,41 @@ html, body {
   align-items: center;
   gap: 6px;
   cursor: pointer;
-  user-select: none;
   padding: 4px;
   border-radius: 4px;
 }
 
 .overlay-header:hover {
-  background: rgba(0,0,0,0.05);
-}
-
-.overlay-check {
-  cursor: pointer;
-}
-
-.overlay-title {
-  font-weight: bold;
-  color: #333;
-}
-
-/* Flecha animada */
-.flecha {
-  transition: transform 0.2s ease;
-  display: inline-block;
-}
-
-.flecha.abierta {
-  transform: rotate(90deg);
-}
-
-/* Panel colapsable */
-.overlay-opciones {
-  margin-left: 20px;
-  padding-left: 6px;
-  border-left: 2px solid #ccc;
-  margin-top: 4px;
-  display: none;
-}
-
-.opacidad-slider {
-  width: 100%;
-}
-
-/* GRUPOS */
-.grupo {
-  margin-bottom: 10px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  background: #fafafa;
-}
-
-.grupo-header {
-  padding: 6px 8px;
-  font-weight: bold;
-  background: #e6e6e6;
-  cursor: pointer;
-  user-select: none;
-  border-radius: 4px 4px 0 0;
-}
-
-.grupo-header:hover {
-  background: #dcdcdc;
-}
-
-.grupo-contenido {
-  padding: 3px;
-  display: none;
-}
-
-.grupo.abierto .grupo-contenido {
-  display: block;
-}
-.overlay-opciones {
-  font-size: 10px;
-}
-
-.overlay-opciones img {
-  max-width: 100%;
-}
-
-.ol-popup {
-  position: absolute;
-  background: white;
-  padding: 10px;
-  border-radius: 6px;
-  border: 1px solid #ccc;
-  min-width: 200px;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.3);
-  font-size: 13px;
-  z-index: 2000;
-}
-
-.popup-content b {
-  color: #333;
-}
-.popup-content h4 {
-  margin: 4px 0;
-  font-size: 14px;
-  color: #333;
-}
-
-.popup-content hr {
-  margin: 6px 0;
-  border: none;
-  border-top: 1px solid #ccc;
-}
-
-.overlay-wrapper {
-  margin-bottom: 6px;
-  font-size: 13px;
-}
-
-.overlay-header {
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 6px;
+  background: rgba(0,0,0,.05);
 }
 
 .overlay-title {
   flex: 1;
+  font-weight: bold;
 }
 
-.overlay-content {
+.flecha {
+  width: 14px;
+  text-align: center;
+}
+
+.overlay-opciones {
   margin-left: 18px;
-  margin-top: 4px;
+  padding-left: 6px;
+  border-left: 2px solid #ccc;
+  display: none;
 }
 
-.overlay-opacidad label {
+.overlay-opciones.abierto {
+  display: block;
+}
+
+.overlay-opacidad {
+  margin-bottom: 6px;
   font-size: 11px;
 }
 
+/* LEYENDAS */
 .leyenda-custom {
   margin-top: 6px;
 }
@@ -189,7 +82,7 @@ html, body {
 }
 
 .leyenda-linea {
-  width: 80px;
+  width: 120px;
   margin-top: 6px;
 }
 
@@ -198,76 +91,43 @@ html, body {
   height: 12px;
   border-radius: 50%;
 }
-/* Contenedor general del popup */
-.popup-tabs {
-  width: 260px;
-  max-height: 300px;   /* altura máxima visible */
-  overflow-y: auto;    /* scroll vertical */
-  overflow-x: hidden;  /* evita scroll horizontal */
-  font-family: Arial, sans-serif;
+
+.leyenda-wms {
+  max-width: 240px;
+  margin-top: 6px;
   background: #fff;
+  border: 1px solid #ccc;
+  padding: 4px;
   border-radius: 4px;
 }
-
-/* Ajuste para que el scroll no afecte las pestañas */
-.popup-tab-bodies {
-  max-height: 240px;   /* espacio para el contenido */
-  overflow-y: auto;
-  padding: 6px;
-}
-/* Header del popup */
-.popup-header {
-  width: 100%;
-  background: #004a8f;
-  color: white;
-  padding: 4px 8px;
-  display: flex;
-  justify-content: flex-end;
-  border-radius: 4px 4px 0 0;
-}
-
-/* Botón de cierre */
-.popup-close {
-  cursor: pointer;
-  font-size: 14px;
-  font-weight: bold;
-}
-
-/* Contenedor general */
-.popup-tabs {
-  width: 260px;
-  max-height: 300px;
-  overflow-y: auto;
-  overflow-x: hidden;
-  background: #fff;
-  border-radius: 0 0 4px 4px;
+.panel-info {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 300px;
+  max-height: 90vh;
+  background: #ffffff;
+  border-radius: 6px;
   box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+  padding: 10px;
+  overflow-y: auto;
+  z-index: 2000;
+  display: none;
+  font-family: Arial, sans-serif;
 }
 
-/* Scroll elegante */
-.popup-tabs::-webkit-scrollbar,
-.popup-tab-bodies::-webkit-scrollbar {
-  width: 6px;
+.panel-info h3 {
+  margin: 0 0 10px;
+  font-size: 16px;
+  color: #004a8f;
 }
 
-.popup-tabs::-webkit-scrollbar-thumb,
-.popup-tab-bodies::-webkit-scrollbar-thumb {
-  background: #bbb;
-  border-radius: 3px;
-}
-
-.popup-tabs::-webkit-scrollbar-thumb:hover,
-.popup-tab-bodies::-webkit-scrollbar-thumb:hover {
-  background: #999;
-}
-
-/* Pestañas */
-.popup-tab-headers {
+.panel-info .tab-headers {
   display: flex;
   border-bottom: 1px solid #ccc;
 }
 
-.popup-tab-header {
+.panel-info .tab-header {
   flex: 1;
   padding: 6px;
   text-align: center;
@@ -277,41 +137,41 @@ html, body {
   font-size: 13px;
 }
 
-.popup-tab-header.active {
+.panel-info .tab-header.active {
   background: #ffffff;
   font-weight: bold;
 }
 
-.popup-tab-bodies {
-  max-height: 240px;
-  overflow-y: auto;
+.panel-info .tab-body {
+  display: none;
   padding: 6px;
 }
 
-.popup-tab-body {
-  display: none;
-}
-
-.popup-tab-body.active {
+.panel-info .tab-body.active {
   display: block;
 }
 
-/* Tabla */
-.popup-table {
+.panel-info table {
   width: 100%;
   border-collapse: collapse;
   font-size: 13px;
 }
 
-.popup-table th {
+.panel-info th {
   text-align: left;
   width: 40%;
-  color: #333;
   padding: 3px 0;
+  color: #333;
 }
 
-.popup-table td {
+.panel-info td {
   padding: 3px 0;
   color: #000;
 }
 
+.panel-info .close-btn {
+  float: right;
+  cursor: pointer;
+  font-weight: bold;
+  color: #004a8f;
+}

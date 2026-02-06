@@ -1,25 +1,11 @@
-/************************************************
- * OVERLAYS / TOC AVANZADO
- * - Checkbox visibilidad
- * - Panel desplegable
- * - Opacidad
- * - Leyenda mixta (custom / WMS)
- ************************************************/
-
-/**
- * Crea un overlay con controles y leyenda
- * @param {string} nombre
- * @param {ol.layer.Layer} layer
- * @param {HTMLElement} contenedor
- */
 function crearOverlayConOpciones(nombre, layer, contenedor) {
   if (!contenedor) return;
 
-  /* CONTENEDOR PRINCIPAL */
   const wrapper = document.createElement('div');
   wrapper.className = 'overlay-wrapper';
 
-  /* CABECERA */
+  /* ================= HEADER ================= */
+
   const header = document.createElement('div');
   header.className = 'overlay-header';
 
@@ -28,7 +14,7 @@ function crearOverlayConOpciones(nombre, layer, contenedor) {
   check.checked = layer.getVisible();
 
   const flecha = document.createElement('span');
-  flecha.className = 'overlay-arrow';
+  flecha.className = 'flecha';
   flecha.textContent = '▸';
 
   const titulo = document.createElement('span');
@@ -39,115 +25,101 @@ function crearOverlayConOpciones(nombre, layer, contenedor) {
   header.appendChild(flecha);
   header.appendChild(titulo);
 
-  /* CONTENIDO DESPLEGABLE */
+  /* ================= CONTENIDO ================= */
+
   const contenido = document.createElement('div');
-  contenido.className = 'overlay-content';
-  contenido.style.display = 'none';
+  contenido.className = 'overlay-opciones';
 
-  /* OPACIDAD */
-  const opWrap = document.createElement('div');
-  opWrap.className = 'overlay-opacidad';
+  /* ---------- Opacidad ---------- */
+  const opDiv = document.createElement('div');
+  opDiv.className = 'overlay-opacidad';
 
-  const opLabel = document.createElement('label');
-  opLabel.textContent = 'Opacidad';
+  opDiv.innerHTML = `
+    <label>
+      Opacidad
+      <input type="range" min="0" max="1" step="0.1" value="${layer.getOpacity()}">
+    </label>
+  `;
 
-  const slider = document.createElement('input');
-  slider.type = 'range';
-  slider.min = 0;
-  slider.max = 1;
-  slider.step = 0.1;
-  slider.value = layer.getOpacity();
-
-  opWrap.appendChild(opLabel);
-  opWrap.appendChild(slider);
-  contenido.appendChild(opWrap);
-
-  /* EVENTOS */
-  check.addEventListener('change', () => {
-    layer.setVisible(check.checked);
-  });
-
+  const slider = opDiv.querySelector('input');
   slider.addEventListener('input', e => {
     layer.setOpacity(parseFloat(e.target.value));
+  });
+
+  contenido.appendChild(opDiv);
+
+  /* ================= LEYENDA ================= */
+
+  if (layer.cfg?.leyenda?.mostrar) {
+
+    // 🔴 CASO 1: WMS categorizado (SLD)
+    if (layer.cfg.leyenda.tipo === 'wms') {
+      const source = layer.getSource();
+      const baseUrl = source.getUrls()[0];
+      const layerName = source.getParams().LAYERS;
+
+      const img = document.createElement('img');
+      img.className = 'leyenda-wms';
+      img.src =
+        `${baseUrl}?REQUEST=GetLegendGraphic` +
+        `&FORMAT=image/png` +
+        `&LAYER=${layerName}`;
+
+      contenido.appendChild(img);
+    }
+
+    // 🟢 CASO 2: leyenda simple custom
+    else {
+      const leyenda = crearLeyendaCustom(layer.cfg.leyenda);
+      contenido.appendChild(leyenda);
+    }
+  }
+
+  /* ================= EVENTOS ================= */
+
+  check.addEventListener('change', () => {
+    layer.setVisible(check.checked);
   });
 
   header.addEventListener('click', e => {
     if (e.target.tagName === 'INPUT') return;
 
-    const abierto = contenido.style.display === 'block';
-    contenido.style.display = abierto ? 'none' : 'block';
-    flecha.textContent = abierto ? '▸' : '▾';
+    const abierto = contenido.classList.toggle('abierto');
+    flecha.textContent = abierto ? '▾' : '▸';
   });
-
-  /* LEYENDA */
-  if (layer.cfg && layer.cfg.leyenda?.mostrar) {
-    const leyenda = crearLeyenda(layer);
-    if (leyenda) contenido.appendChild(leyenda);
-  }
 
   wrapper.appendChild(header);
   wrapper.appendChild(contenido);
   contenedor.appendChild(wrapper);
 }
 
-/************************************************
- * LEYENDA (DECIDE SI ES CUSTOM O WMS)
- ************************************************/
-function crearLeyenda(layer) {
-  const cfg = layer.cfg?.leyenda;
-  if (!cfg) return null;
+/* ================= LEYENDAS CUSTOM ================= */
 
-  // Leyenda WMS completa (restricciones, categorías)
-  if (cfg.tipo === 'wms') {
-    const source = layer.getSource();
-    const baseUrl = source.getUrls()[0];
-    const layerName = source.getParams().LAYERS;
-
-    const img = document.createElement('img');
-    img.src =
-      `${baseUrl}?REQUEST=GetLegendGraphic&FORMAT=image/png&LAYER=${layerName}`;
-
-    img.className = 'leyenda-wms';
-    img.style.maxWidth = '220px';
-    img.style.marginTop = '6px';
-
-    return img;
-  }
-
-  // Leyenda custom simple
-  return crearLeyendaCustom(cfg);
-}
-
-/************************************************
- * LEYENDA CUSTOM (POLÍGONO / LÍNEA / PUNTO)
- ************************************************/
 function crearLeyendaCustom(cfg) {
-  const div = document.createElement('div');
-  div.className = 'leyenda-custom';
+  const cont = document.createElement('div');
+  cont.className = 'leyenda-custom';
 
   if (cfg.tipo === 'polygon') {
     const box = document.createElement('div');
     box.className = 'leyenda-poligono';
     box.style.background = `rgb(${cfg.color})`;
     box.style.border = `1px solid rgb(${cfg.borde || '0,0,0'})`;
-    div.appendChild(box);
+    cont.appendChild(box);
   }
 
   if (cfg.tipo === 'line') {
     const line = document.createElement('div');
     line.className = 'leyenda-linea';
-    line.style.borderTop =
-      `${cfg.ancho || 3}px solid rgb(${cfg.color})`;
-    div.appendChild(line);
+    line.style.borderTop = `${cfg.ancho || 2}px solid rgb(${cfg.color})`;
+    cont.appendChild(line);
   }
 
   if (cfg.tipo === 'point') {
-    const point = document.createElement('div');
-    point.className = 'leyenda-punto';
-    point.style.background = `rgb(${cfg.color})`;
-    div.appendChild(point);
+    const pt = document.createElement('div');
+    pt.className = 'leyenda-punto';
+    pt.style.background = `rgb(${cfg.color})`;
+    cont.appendChild(pt);
   }
 
-  return div;
+  return cont;
 }
-
