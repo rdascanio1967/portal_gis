@@ -167,6 +167,7 @@ map.on('singleclick', function (evt) {
             if (data.features?.length) {
               resultados.push({
                 capa: layer.get('title'),
+                layer: layer,
                 atributos: data.features[0].properties
               });
             }
@@ -185,6 +186,33 @@ map.on('singleclick', function (evt) {
 /************************************************
  * 7. POPUP MULTICAPA
  ************************************************/
+function formatearValor(alias, valor) {
+  if (valor === null || valor === undefined || valor === "") return "-";
+
+  // Fecha YYYY-MM-DD
+  if (/^\d{4}-\d{2}-\d{2}/.test(valor)) {
+    const [y, m, d] = valor.split("-");
+    return `${d}/${m}/${y}`;
+  }
+
+  // Número
+  if (!isNaN(valor)) {
+    const num = Number(valor);
+    let formatted = num.toLocaleString("es-AR");
+
+    if (alias.toLowerCase().includes("superficie")) {
+      return `${formatted} km²`;
+    }
+
+    if (alias.toLowerCase().includes("longitud") || alias.toLowerCase().includes("km")) {
+      return `${formatted} m`;
+    }
+
+    return formatted;
+  }
+
+  return valor;
+}
 
 function mostrarPopupMultiple(resultados, coordinate) {
   if (!resultados.length) {
@@ -192,18 +220,105 @@ function mostrarPopupMultiple(resultados, coordinate) {
     return;
   }
 
-  let html = '<div class="popup-content">';
+  let html = `
+    <div class="popup-header">
+      <span class="popup-close">✖</span>
+    </div>
+    <div class="popup-tabs">
+      <div class="popup-tab-headers">
+  `;
 
-  resultados.forEach(r => {
-    html += `<h4>${r.capa}</h4>`;
-    for (let key in r.atributos) {
-      html += `<b>${key}:</b> ${r.atributos[key]}<br>`;
-    }
-    html += '<hr>';
+  // Cabeceras de pestañas
+  resultados.forEach((r, i) => {
+    html += `<div class="popup-tab-header ${i === 0 ? "active" : ""}" data-tab="${i}">
+               ${r.capa}
+             </div>`;
   });
 
-  html += '</div>';
+  html += `</div><div class="popup-tab-bodies">`;
 
-  document.getElementById('popup').innerHTML = html;
+  // Cuerpo de pestañas
+  resultados.forEach((r, i) => {
+    html += `<div class="popup-tab-body ${i === 0 ? "active" : ""}" data-tab="${i}">
+               <table class="popup-table">`;
+
+    const cfgPopup = r.layer.cfg.popup;
+
+    if (cfgPopup) {
+      for (let campo in cfgPopup) {
+        const alias = cfgPopup[campo];
+        const valor = formatearValor(alias, r.atributos[campo]);
+
+        html += `
+          <tr>
+            <th>${alias}</th>
+            <td>${valor}</td>
+          </tr>`;
+      }
+    } else {
+      for (let key in r.atributos) {
+        html += `
+          <tr>
+            <th>${key}</th>
+            <td>${r.atributos[key]}</td>
+          </tr>`;
+      }
+    }
+
+    html += `</table></div>`;
+  });
+
+  html += `</div></div>`;
+
+  const popup = document.getElementById("popup");
+  popup.innerHTML = html;
   popupOverlay.setPosition(coordinate);
+
+  // Cerrar popup
+  popup.querySelector(".popup-close").addEventListener("click", () => {
+    popupOverlay.setPosition(undefined);
+  });
+
+  // Activar pestañas
+  popup.querySelectorAll(".popup-tab-header").forEach(header => {
+    header.addEventListener("click", () => {
+      const tab = header.dataset.tab;
+
+      popup.querySelectorAll(".popup-tab-header").forEach(h => h.classList.remove("active"));
+      popup.querySelectorAll(".popup-tab-body").forEach(b => b.classList.remove("active"));
+
+      header.classList.add("active");
+      popup.querySelector(`.popup-tab-body[data-tab="${tab}"]`).classList.add("active");
+    });
+  });
+
+  hacerPopupDraggable();
 }
+
+function hacerPopupDraggable() {
+  const popup = document.getElementById("popup");
+  const header = popup.querySelector(".popup-header");
+
+  let offsetX = 0, offsetY = 0, moviendo = false;
+
+  header.style.cursor = "move";
+
+  header.addEventListener("mousedown", e => {
+    moviendo = true;
+    offsetX = e.clientX - popup.offsetLeft;
+    offsetY = e.clientY - popup.offsetTop;
+  });
+
+  document.addEventListener("mousemove", e => {
+    if (!moviendo) return;
+    popup.style.left = `${e.clientX - offsetX}px`;
+    popup.style.top = `${e.clientY - offsetY}px`;
+    popup.style.position = "absolute";
+  });
+
+  document.addEventListener("mouseup", () => {
+    moviendo = false;
+  });
+}
+
+

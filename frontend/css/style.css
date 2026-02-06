@@ -198,3 +198,120 @@ html, body {
   height: 12px;
   border-radius: 50%;
 }
+/* Contenedor general del popup */
+.popup-tabs {
+  width: 260px;
+  max-height: 300px;   /* altura máxima visible */
+  overflow-y: auto;    /* scroll vertical */
+  overflow-x: hidden;  /* evita scroll horizontal */
+  font-family: Arial, sans-serif;
+  background: #fff;
+  border-radius: 4px;
+}
+
+/* Ajuste para que el scroll no afecte las pestañas */
+.popup-tab-bodies {
+  max-height: 240px;   /* espacio para el contenido */
+  overflow-y: auto;
+  padding: 6px;
+}
+/* Header del popup */
+.popup-header {
+  width: 100%;
+  background: #004a8f;
+  color: white;
+  padding: 4px 8px;
+  display: flex;
+  justify-content: flex-end;
+  border-radius: 4px 4px 0 0;
+}
+
+/* Botón de cierre */
+.popup-close {
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: bold;
+}
+
+/* Contenedor general */
+.popup-tabs {
+  width: 260px;
+  max-height: 300px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  background: #fff;
+  border-radius: 0 0 4px 4px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+}
+
+/* Scroll elegante */
+.popup-tabs::-webkit-scrollbar,
+.popup-tab-bodies::-webkit-scrollbar {
+  width: 6px;
+}
+
+.popup-tabs::-webkit-scrollbar-thumb,
+.popup-tab-bodies::-webkit-scrollbar-thumb {
+  background: #bbb;
+  border-radius: 3px;
+}
+
+.popup-tabs::-webkit-scrollbar-thumb:hover,
+.popup-tab-bodies::-webkit-scrollbar-thumb:hover {
+  background: #999;
+}
+
+/* Pestañas */
+.popup-tab-headers {
+  display: flex;
+  border-bottom: 1px solid #ccc;
+}
+
+.popup-tab-header {
+  flex: 1;
+  padding: 6px;
+  text-align: center;
+  cursor: pointer;
+  background: #f2f2f2;
+  border-right: 1px solid #ccc;
+  font-size: 13px;
+}
+
+.popup-tab-header.active {
+  background: #ffffff;
+  font-weight: bold;
+}
+
+.popup-tab-bodies {
+  max-height: 240px;
+  overflow-y: auto;
+  padding: 6px;
+}
+
+.popup-tab-body {
+  display: none;
+}
+
+.popup-tab-body.active {
+  display: block;
+}
+
+/* Tabla */
+.popup-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.popup-table th {
+  text-align: left;
+  width: 40%;
+  color: #333;
+  padding: 3px 0;
+}
+
+.popup-table td {
+  padding: 3px 0;
+  color: #000;
+}
+
