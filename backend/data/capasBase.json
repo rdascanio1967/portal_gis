@@ -26,16 +26,16 @@
     "visible": true,
     "leyenda": {
       "mostrar": true,
-      "tipo": "polygon",
-      "color": "255,215,0",
-      "borde": "51,51,51",
-      "ancho": 1
+      "tipo": "wms"
     },
-    "controles": {
-      "opacidad": true,
-      "visible": true
+    "popup": {
+      "NOMBRE": "Partido",
+      "CODIGO": "Código",
+      "POBLACION": "Población",
+      "SUPERFICIE": "Superficie (km²)"
     }
   },
+
   {
     "id": "Zonas",
     "titulo": "Zonas Viales",
@@ -47,14 +47,12 @@
     "visible": false,
     "leyenda": {
       "mostrar": true,
-      "tipo": "polygon",
-      "color": "255,215,0",
-      "borde": "51,51,51",
-      "ancho": 1
+      "tipo": "wms"
     },
-    "controles": {
-      "opacidad": true,
-      "visible": true
+    "popup": {
+      "ZONA": "Zona",
+      "CODIGO": "Código",
+      "DESCRIPCION": "Descripción"
     }
   },
 
@@ -68,9 +66,13 @@
     "visible": false,
     "leyenda": {
       "mostrar": true,
-      "tipo": "line",
-      "color": "200,0,0",
-      "ancho": 3
+      "tipo": "wms"
+    },
+    "popup": {
+      "NRO_RUTA": "Ruta",
+      "TIPO": "Tipo",
+      "CLASE": "Clase",
+      "LONG_M": "Longitud (m)"
     }
   },
 
@@ -84,11 +86,16 @@
     "visible": false,
     "leyenda": {
       "mostrar": true,
-      "tipo": "line",
-      "color": "200,0,0",
-      "ancho": 3
+      "tipo": "wms"
+    },
+    "popup": {
+      "TIPO": "Tipo",
+      "DESCRIPCION": "Descripción",
+      "KM_INICIO": "Km inicio",
+      "KM_FIN": "Km fin"
     }
   },
+
   {
     "id": "obras_viales",
     "titulo": "Obras Viales",
@@ -99,9 +106,13 @@
     "visible": false,
     "leyenda": {
       "mostrar": true,
-      "tipo": "line",
-      "color": "200,0,0",
-      "ancho": 3
+      "tipo": "wms"
+    },
+    "popup": {
+      "OBRA": "Obra",
+      "TIPO": "Tipo",
+      "ESTADO": "Estado",
+      "AVANCE": "Avance (%)"
     }
   },
 
@@ -115,14 +126,16 @@
     "visible": false,
     "leyenda": {
       "mostrar": true,
-      "tipo": "point",
-      "color": "255,0,0",
-      "ancho": 6
+      "tipo": "wms"
+    },
+    "popup": {
+      "FECHA": "Fecha",
+      "TIPO": "Tipo",
+      "FALLECIDOS": "Fallecidos",
+      "HERIDOS": "Heridos"
     }
   }
 ]
-
-
 
 
   
